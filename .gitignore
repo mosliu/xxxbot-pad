@@ -217,3 +217,16 @@ WechatAPI/Client/login_stat.json
 /WechatAPIDocs/_build/html/search.html
 /WechatAPIDocs/_build/html/searchindex.js
 !/plugins/update_qr.py
+
+
+#新加的
+logs
+.idea
+api_service/api_service_status.txt
+admin/admin_server_status.txt
+bot_status.json
+main_config.toml
+admin/bot_status.json
+admin/bot_instance_status.txt
+database/*.db
+849/redis/dump.rdb

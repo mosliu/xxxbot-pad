@@ -36,6 +36,17 @@ try:
             logger.warning("admin.server.set_bot_instance未导入，调用被忽略")
             return None
 
+    # 导入API服务模块
+    try:
+        from api_service.server import set_bot_instance as api_set_bot_instance
+        logger.debug("成功导入api_service.server.set_bot_instance")
+    except ImportError as e:
+        logger.error(f"导入api_service.server.set_bot_instance失败: {e}")
+        # 创建一个空函数
+        def api_set_bot_instance(bot):
+            logger.warning("api_service.server.set_bot_instance未导入，调用被忽略")
+            return None
+
     # 直接定义状态更新函数，不依赖导入
     def update_bot_status(status, details=None, extra_data=None):
         """更新bot状态，供管理后台读取"""
@@ -87,9 +98,12 @@ try:
 
     # 定义设置bot实例的函数
     def set_bot_instance(bot):
-        """设置bot实例到管理后台"""
+        """设置bot实例到管理后台和API服务"""
         # 先调用admin模块的设置函数
         admin_set_bot_instance(bot)
+
+        # 调用API服务模块的设置函数
+        api_set_bot_instance(bot)
 
         # 更新状态
         update_bot_status("initialized", "机器人实例已设置")

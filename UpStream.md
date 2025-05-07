@@ -48,7 +48,7 @@ Bash
     在你的本地项目目录中，运行以下命令：
     Bash
 
-git remote add upstream https://github.com/NanSsye/xxxbot-pad.git
+`git remote add upstream https://github.com/NanSsye/xxxbot-pad.git`
 
 验证是否添加成功：
 Bash
@@ -69,7 +69,7 @@ Bash
     确保你在你的本地主分支上 (通常是 main 或 master)：
     Bash
 
-git checkout main  # 或者 git checkout master
+`git checkout main  `
 
 从上游仓库抓取最新的更改：
 Bash

@@ -78,6 +78,55 @@ def start_admin_server(config):
         logger.error(traceback.format_exc())
         return None
 
+# 管理后台启动函数
+def start_service_server(config):
+    """启动管理后台服务器"""
+    try:
+        # 导入需要的模块
+        from api_service.server import start_server
+
+        api_service_config = config.get("ApiService", {})
+        api_service_enabled = api_service_config.get("enabled", True)
+
+        if not api_service_enabled:
+            logger.info("ApiService功能已禁用")
+            return None
+
+        admin_host = api_service_config.get("host", "0.0.0.0")
+        admin_port = api_service_config.get("port", 18888)
+        admin_debug = api_service_config.get("debug", False)
+
+        # 提前启动管理后台服务
+        logger.info(f"启动ApiService功能，地址: {admin_host}:{admin_port}")
+
+        # 标记当前正在启动的管理后台实例
+        admin_status_file = Path("api_service/api_service_status.txt")
+        with open(admin_status_file, "w") as f:
+            f.write(f"启动时间: {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+            f.write(f"主机: {admin_host}:{admin_port}\n")
+            f.write(f"状态: 正在启动\n")
+
+        server_thread = start_server(
+            host_arg=admin_host,
+            port_arg=admin_port,
+            debug_arg=admin_debug,
+            bot=None  # 暂时没有bot实例
+        )
+
+        # 更新状态文件
+        with open(admin_status_file, "w") as f:
+            f.write(f"启动时间: {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+            f.write(f"主机: {admin_host}:{admin_port}\n")
+            f.write(f"状态: 运行中\n")
+
+        logger.success(f"管理后台已启动: http://{admin_host}:{admin_port}")
+        return server_thread
+    except Exception as e:
+        logger.error(f"启动管理后台时出错: {e}")
+        logger.error(traceback.format_exc())
+        return None
+
+
 def is_api_message(record):
     return record["level"].name == "API"
 
@@ -126,6 +175,9 @@ async def main():
 
     # 启动管理后台（提前启动）
     admin_server_thread = start_admin_server(config)
+
+    # 启动serviceApi服务
+    service_server_thread = start_service_server(config)
 
     # 启动 linuxService - 现在已经在entrypoint.sh中启动
     # try:

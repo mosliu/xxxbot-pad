@@ -38,7 +38,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from itsdangerous import URLSafeSerializer
 from functools import wraps
-import websockets
+# import websockets
 
 # 导入API管理中心
 try:
