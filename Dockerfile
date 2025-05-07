@@ -28,7 +28,7 @@ RUN apt-get update && apt-get install -y \
     npm
 
 # 安装 wetty 2.5.0版本
-RUN npm install -g wetty@2.5.0
+RUN npm install -g wetty@2.5.0  --registry=https://registry.npmmirror.com
 
 # 安装 procps 工具
 RUN apt-get update && apt-get install -y procps
@@ -42,10 +42,11 @@ COPY redis.conf /etc/redis/redis.conf
 # 复制依赖文件
 COPY requirements.txt .
 
-# 升级pip并安装Python依赖
-RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir websockets httpx
+# 升级pip并使用清华源安装Python依赖
+RUN pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple && \
+    pip install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple && \
+    pip install --no-cache-dir websockets httpx -i https://pypi.tuna.tsinghua.edu.cn/simple
+
 
 # 复制应用代码
 COPY . .
