@@ -6,9 +6,12 @@ WORKDIR /app
 # 设置环境变量
 ENV TZ=Asia/Shanghai
 ENV IMAGEIO_FFMPEG_EXE=/usr/bin/ffmpeg
-
-# 更新软件源
-RUN apt-get update
+# DEBIAN_FRONTEND=noninteractive 用于在apt-get安装时避免交互式提示
+ENV DEBIAN_FRONTEND=noninteractive
+# 更换为清华大学的APT软件源
+RUN sed -i 's/deb.debian.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list.d/debian.sources \
+    && sed -i 's/security.debian.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list.d/debian.sources \
+    && apt-get update
 
 # 分步安装系统依赖，以便于调试
 RUN apt-get install -y ffmpeg 
