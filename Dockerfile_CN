@@ -6,12 +6,15 @@ WORKDIR /app
 # 设置环境变量
 ENV TZ=Asia/Shanghai
 ENV IMAGEIO_FFMPEG_EXE=/usr/bin/ffmpeg
-
-# 更新软件源
-RUN apt-get update
+# DEBIAN_FRONTEND=noninteractive 用于在apt-get安装时避免交互式提示
+ENV DEBIAN_FRONTEND=noninteractive
+# 更换为清华大学的APT软件源
+RUN sed -i 's/deb.debian.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list.d/debian.sources \
+    && sed -i 's/security.debian.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list.d/debian.sources \
+    && apt-get update
 
 # 分步安装系统依赖，以便于调试
-RUN apt-get install -y ffmpeg
+RUN apt-get install -y ffmpeg 
 RUN apt-get install -y redis-server
 RUN apt-get install -y build-essential python3-dev
 RUN apt-get install -y p7zip-full
@@ -25,7 +28,7 @@ RUN apt-get update && apt-get install -y \
     npm
 
 # 安装 wetty 2.5.0版本
-RUN npm install -g wetty@2.5.0
+RUN npm install -g wetty@2.5.0  --registry=https://registry.npmmirror.com
 
 # 安装 procps 工具
 RUN apt-get update && apt-get install -y procps
@@ -39,10 +42,11 @@ COPY redis.conf /etc/redis/redis.conf
 # 复制依赖文件
 COPY requirements.txt .
 
-# 升级pip并安装Python依赖
-RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir websockets httpx
+# 升级pip并使用清华源安装Python依赖
+RUN pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple && \
+    pip install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple && \
+    pip install --no-cache-dir websockets httpx -i https://pypi.tuna.tsinghua.edu.cn/simple
+
 
 # 复制应用代码
 COPY . .
